@@ -16,7 +16,7 @@ def get_posts():
 
 
 @app.route('/api/posts', methods=['GET', 'POST'])
-def manage_books():
+def manage_posts():
     if request.method == 'POST':
         # Get the new post data from the client
         new_post = request.get_json()
@@ -38,13 +38,23 @@ def manage_books():
         # Handle the GET request
         return jsonify(POSTS)
 
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return jsonify({"error": "Not Found"}), 404
+
+
+@app.errorhandler(405)
+def method_not_allowed_error(error):
+    return jsonify({"error": "Method Not Allowed"}), 405
+
+
 def validate_post_data(data):
     if "title" not in data or "content" not in data:
-        return False
+        return "Title or Content missing"
     if not data["title"].strip() or not data["content"].strip():
         return False
     return True
-
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5002, debug=True)
