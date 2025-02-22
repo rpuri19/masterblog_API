@@ -64,6 +64,29 @@ def delete_post(id):
     return jsonify({"message": "Post deleted", "post": post})
 
 
+@app.route('/api/posts/<int:id>', methods=['PUT'])
+def handle_post(id):
+    # Find the post with the given ID
+    post = find_post_by_id(id)
+
+    # If the post wasn't found, return a 404 error
+    if post is None:
+        return 'Post not found', 404
+
+    # Get the new data
+    new_data = request.get_json()
+
+    # Validate the new data
+    if not validate_post_data(new_data):
+        return jsonify({"error": "Invalid post data"}), 400
+
+    # Update the post with the new data
+    post.update(new_data)
+
+    # Return the updated post
+    return jsonify(post)
+
+
 @app.errorhandler(404)
 def not_found_error(error):
     return jsonify({"error": "Not Found"}), 404
