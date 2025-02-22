@@ -87,6 +87,31 @@ def handle_post(id):
     return jsonify(post)
 
 
+@app.route('/api/posts/search', methods=['GET'])
+def search_posts():
+    """Search for posts by title or content"""
+
+    # Get the search parameters and strip extra spaces
+    title_search = request.args.get('title', '').strip().lower()
+    content_search = request.args.get('content', '').strip().lower()
+    print (title_search)
+    print(content_search)
+    # Filter posts by title or content
+
+    title_query = request.args.get('title', '').strip().lower()
+    content_query = request.args.get('content', '').strip().lower()
+
+    filtered_posts = [
+        post for post in POSTS
+        if (title_query and title_query in post['title'].lower()) or
+           (content_query and content_query in post['content'].lower())
+    ]
+    if filtered_posts:
+        return jsonify(filtered_posts)
+    else:
+        return jsonify({"error": "Post not found "}), 404
+
+
 @app.errorhandler(404)
 def not_found_error(error):
     return jsonify({"error": "Not Found"}), 404
