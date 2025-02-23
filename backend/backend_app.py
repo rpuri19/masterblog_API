@@ -12,6 +12,7 @@ POSTS = [
 
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
+    """Fetches all the posts (sorted or original)."""
     # Get the sort and direction query parameters
     sort_field = request.args.get('sort', None)
     direction = request.args.get('direction', 'asc').lower()
@@ -24,7 +25,6 @@ def get_posts():
         if direction not in ['asc', 'desc']:
             return jsonify({"error": "Invalid direction. Use 'asc' or 'desc'."}), 400
 
-        # Sort the posts based on the provided field and direction
         POSTS.sort(key=lambda post: post[sort_field].lower(), reverse=(direction == 'desc'))
 
     # Return the (sorted or original) posts
@@ -32,6 +32,7 @@ def get_posts():
 
 @app.route('/api/posts', methods=['GET', 'POST'])
 def manage_posts():
+    """Add a new post"""
     if request.method == 'POST':
         # Get the new post data from the client
         new_post = request.get_json()
@@ -65,7 +66,7 @@ def find_post_by_id(post_id):
 
 @app.route('/api/posts/<int:id>', methods=['DELETE'])
 def delete_post(id):
-    # Find the post with the given ID
+    """ Find the post with the given ID and delete it."""
     post = find_post_by_id(id)
 
     # If the post wasn't found, return a 404 error
@@ -81,7 +82,7 @@ def delete_post(id):
 
 @app.route('/api/posts/<int:id>', methods=['PUT'])
 def handle_post(id):
-    # Find the post with the given ID
+    """ Find the post with the given ID and update it"""
     post = find_post_by_id(id)
 
     # If the post wasn't found, return a 404 error
