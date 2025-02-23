@@ -12,8 +12,23 @@ POSTS = [
 
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
-    return jsonify(POSTS)
+    # Get the sort and direction query parameters
+    sort_field = request.args.get('sort', None)
+    direction = request.args.get('direction', 'asc').lower()
 
+    # If sorting is requested, validate the parameters
+    if sort_field:
+        if sort_field not in ['title', 'content']:
+            return jsonify({"error": "Invalid sort field. Use 'title' or 'content'."}), 400
+
+        if direction not in ['asc', 'desc']:
+            return jsonify({"error": "Invalid direction. Use 'asc' or 'desc'."}), 400
+
+        # Sort the posts based on the provided field and direction
+        POSTS.sort(key=lambda post: post[sort_field].lower(), reverse=(direction == 'desc'))
+
+    # Return the (sorted or original) posts
+    return jsonify(POSTS)
 
 @app.route('/api/posts', methods=['GET', 'POST'])
 def manage_posts():
@@ -90,13 +105,6 @@ def handle_post(id):
 @app.route('/api/posts/search', methods=['GET'])
 def search_posts():
     """Search for posts by title or content"""
-
-    # Get the search parameters and strip extra spaces
-    title_search = request.args.get('title', '').strip().lower()
-    content_search = request.args.get('content', '').strip().lower()
-    print (title_search)
-    print(content_search)
-    # Filter posts by title or content
 
     title_query = request.args.get('title', '').strip().lower()
     content_query = request.args.get('content', '').strip().lower()
